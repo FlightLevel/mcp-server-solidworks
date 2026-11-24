@@ -1,0 +1,16 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <!-- Built by installer\build.ps1, which stages the payload first and passes StageDir/ProductVersion. -->
+  <PropertyGroup>
+    <OutputName>SolidPilot-$(ProductVersion)-x64</OutputName>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <DefineConstants>StageDir=$(StageDir);ProductVersion=$(ProductVersion)</DefineConstants>
+    <!-- Per-user install into %LOCALAPPDATA%\Programs: harvested file components use file key paths
+         and the profile folders are wiped by RemoveFile/RemoveFolder, which these ICEs don't model. -->
+    <SuppressIces>ICE38;ICE64;ICE91</SuppressIces>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>

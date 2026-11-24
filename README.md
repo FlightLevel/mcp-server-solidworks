@@ -181,6 +181,15 @@ The drawing tools were added after the initial part-modeling set and are now a s
 
 ## Installation and Running
 
+### Windows installer
+
+To build a distributable `.msi` (bundles the server, the adapter and its own Python, and registers with
+Claude Desktop), see [installer/README.md](installer/README.md):
+
+```
+.\installer\build.ps1 -InteropDir C:\sw2024-interop -Version 1.0.0
+```
+
 ### Requirements
 - Windows and **SolidWorks 2024 or newer** (2024, 2025, 2026). Build the execution layer against the oldest version you run — see "SolidWorks version" below.
 - **.NET Framework 4.8** and MSBuild for the execution layer (ships with Visual Studio 2022).

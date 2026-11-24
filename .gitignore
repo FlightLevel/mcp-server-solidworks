@@ -52,3 +52,5 @@ execution/solidworks/SolidworksExecution/bin/*
 execution/solidworks/SolidworksExecution/bin/Debug/*.log
 
 
+installer/out/
+installer/cache/

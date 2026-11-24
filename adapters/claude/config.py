@@ -30,12 +30,11 @@ CONNECT_TIMEOUT = float(os.getenv("CONNECT_TIMEOUT", "10"))
 # Auto-start of the execution server (so the user never has to launch the exe by hand).
 # Default points at the standard Debug build output, two dirs up from this adapter package
 # (adapters/claude → repo root → execution/solidworks/...). Override via .env if needed.
-_DEFAULT_EXE = os.path.normpath(
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "..", "..",
-        "execution", "solidworks", "SolidworksExecution", "bin", "Debug", "SolidworksExecution.exe",
-    )
+_ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+# The MSI installer puts the server in <root>/server/ (see installer/); a source checkout uses bin/Debug.
+_INSTALLED_EXE = os.path.join(_ROOT, "server", "SolidworksExecution.exe")
+_DEFAULT_EXE = _INSTALLED_EXE if os.path.isfile(_INSTALLED_EXE) else os.path.join(
+    _ROOT, "execution", "solidworks", "SolidworksExecution", "bin", "Debug", "SolidworksExecution.exe",
 )
 EXECUTION_EXE_PATH = os.getenv("EXECUTION_EXE_PATH", _DEFAULT_EXE)
 # How long to wait for a freshly-spawned server to answer /health before giving up.

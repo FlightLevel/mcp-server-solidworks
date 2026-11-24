@@ -31,7 +31,7 @@ Rules that must never be violated:
 ## Development environment
 
 ### Requirements
-- Windows and **SolidWorks 2026** (development happens against a local SolidWorks install).
+- Windows and **SolidWorks 2024 or newer** (development happens against a local SolidWorks install).
 - **.NET Framework 4.8** and MSBuild (ships with Visual Studio 2022).
 - **Python 3.x** and the official **MCP Python SDK v2** (`mcp>=2.0.0`) for the MCP adapter.
 

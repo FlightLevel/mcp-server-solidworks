@@ -17,6 +17,28 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
+  <!--
+    SolidWorks interop location. Build against the OLDEST SolidWorks you need to support: the
+    interop assemblies are forward-compatible (a 2024 build runs on 2024, 2025 and 2026), but a
+    build made against the 2026 (v34) interop is not guaranteed on 2024 (v32).
+    Resolution order:
+      1. /p:SolidWorksApiRedist=<folder>       (explicit override)
+      2. the install folder of /p:SolidWorksVersion (default 2024), read from the registry
+      3. the default install path
+  -->
+  <PropertyGroup>
+    <SolidWorksVersion Condition=" '$(SolidWorksVersion)' == '' ">2024</SolidWorksVersion>
+    <SolidWorksInstallDir Condition=" '$(SolidWorksInstallDir)' == '' ">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\SolidWorks\SOLIDWORKS $(SolidWorksVersion)\Setup', 'SolidWorks Folder', null, RegistryView.Registry64))</SolidWorksInstallDir>
+    <SolidWorksInstallDir Condition=" '$(SolidWorksInstallDir)' == '' ">C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\</SolidWorksInstallDir>
+    <SolidWorksApiRedist Condition=" '$(SolidWorksApiRedist)' == '' ">$([MSBuild]::EnsureTrailingSlash('$(SolidWorksInstallDir)'))api\redist</SolidWorksApiRedist>
+    <!-- Normalized copy (a /p: global property cannot be reassigned inside the project). -->
+    <SwInteropDir>$([MSBuild]::EnsureTrailingSlash('$(SolidWorksApiRedist)'))</SwInteropDir>
+  </PropertyGroup>
+  <Target Name="CheckSolidWorksInterop" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition=" !Exists('$(SwInteropDir)SolidWorks.Interop.sldworks.dll') "
+           Text="SolidWorks interop not found in '$(SwInteropDir)'. Install SolidWorks $(SolidWorksVersion) or pass /p:SolidWorksApiRedist=&lt;folder containing SolidWorks.Interop.sldworks.dll&gt;." />
+    <Message Importance="high" Text="SolidWorks interop: $(SwInteropDir)" />
+  </Target>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
@@ -65,17 +87,17 @@
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
-      <HintPath>C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\api\redist\SolidWorks.Interop.sldworks.dll</HintPath>
+      <HintPath>$(SwInteropDir)SolidWorks.Interop.sldworks.dll</HintPath>
       <Private>True</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.swconst">
-      <HintPath>C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\api\redist\SolidWorks.Interop.swconst.dll</HintPath>
+      <HintPath>$(SwInteropDir)SolidWorks.Interop.swconst.dll</HintPath>
       <Private>False</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.swpublished">
-      <HintPath>C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\api\redist\SolidWorks.Interop.swpublished.dll</HintPath>
+      <HintPath>$(SwInteropDir)SolidWorks.Interop.swpublished.dll</HintPath>
       <Private>False</Private>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>

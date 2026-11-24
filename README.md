@@ -10,7 +10,7 @@ SolidPilot lets an AI model work with SolidWorks at the **CAD feature level**. T
 
 SolidPilot is **not** a Claude-only plugin; it is **a general bridge between SolidWorks and AI.** Because MCP is an open standard, any MCP-capable AI client can connect — alongside Claude, OpenClaw, OpenAI-based agents, and local LLMs are also targeted. The architecture was designed for this extensibility **from the start**: the execution and planner layers do not know which client is calling them; a thin adapter per client reuses a shared bridge core. `adapters/claude/` is the current implementation; supporting a new AI client means only adding a new adapter.
 
-> Repository: `mcp-server-solidworks` · Public name: **SolidPilot** · Target version: **SolidWorks 2026 SP3**
+> Repository: `mcp-server-solidworks` · Public name: **SolidPilot** · Target version: **SolidWorks 2024 or newer** (developed on 2026 SP3)
 
 ---
 
@@ -182,7 +182,7 @@ The drawing tools were added after the initial part-modeling set and are now a s
 ## Installation and Running
 
 ### Requirements
-- Windows and **SolidWorks 2026**.
+- Windows and **SolidWorks 2024 or newer** (2024, 2025, 2026). Build the execution layer against the oldest version you run — see "SolidWorks version" below.
 - **.NET Framework 4.8** and MSBuild for the execution layer (ships with Visual Studio 2022).
 - **Python 3.x** and the official **MCP Python SDK v2** (`mcp>=2.0.0`, protocol `2026-07-28`) for the
   adapter (Python dependencies are installed via `requirements.txt`).
@@ -194,6 +194,21 @@ Build the solution:
 ```
 & "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" execution\solidworks\SolidworksExecution.sln /t:Build /p:Configuration=Debug
 ```
+
+#### SolidWorks version
+
+The build references the SolidWorks interop DLLs from the installed SolidWorks (`<install>\api\redist`).
+By default it looks up the **SolidWorks 2024** install folder in the registry, then falls back to
+`C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\`. Interop built against 2024 also runs on 2025 and 2026;
+the reverse is not guaranteed, so build against the oldest SolidWorks you need. Overrides:
+
+```
+/p:SolidWorksVersion=2025                                  # use a different installed version
+/p:SolidWorksApiRedist="D:\SOLIDWORKS\api\redist"          # point straight at the interop folder
+```
+
+The prebuilt `bin\Debug` shipped in the repo was compiled against SolidWorks 2026 (API v34). On a 2024
+machine, rebuild it with the command above so the 2024 (v32) interop is used.
 
 Run the server (headless, `http://localhost:5000`):
 
